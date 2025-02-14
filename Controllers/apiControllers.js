@@ -37,9 +37,6 @@ const searchMovies = async(req,res)=>{
     }
 }
 
-
-
-
 const getActors = async(req,res)=>{
     try{
 
