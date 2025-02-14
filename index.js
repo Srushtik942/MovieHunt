@@ -1,11 +1,12 @@
+require('dotenv').config();
 const express = require('express');
-const{searchMovies} = require('./Controllers/apiControllers');
-
+const{searchMovies, getActors} = require('./Controllers/apiControllers');
 const app = express();
 app.use(express.json());
 
 
 app.get('/api/search/movie',searchMovies);
+app.get('/api/movie/:movieId/actors',getActors);
 
 
 const PORT = 3000
