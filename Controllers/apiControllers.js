@@ -8,6 +8,7 @@ if (!TMDB_API_KEY) {
       res.status(404).json({message:"Missing TMDB API Key! Check your .env file."});
 }
 
+// const actors = await
 
 // : Making API Calls From TMDB
 const searchMovies = async(req,res)=>{
@@ -21,15 +22,24 @@ const searchMovies = async(req,res)=>{
 
     const response = await axiosInstance.get(`https://api.themoviedb.org/3/search/movie?query=${query}&api_key=${TMDB_API_KEY}`);
 
-    const movies = response.data.results.map((movie)=>({
-        title: movie.title,
-        tmdbid: movie.id,
-        genre: movie.genre_ids,
-        releaseYear:movie.release_date,
-        rating :movie.vote_average,
-        description: movie.overview,
-    }));
-    // console.log(movies);
+    const movies = await Promise.all(
+        response.data.results.map(async(movie)=>{
+
+            const actors = await getActors(movie.id);
+
+            return {
+                    title: movie.title,
+                    tmdbid: movie.id,
+                    genre: movie.genre_ids.join(", "),
+                    actors: actors,
+                    releaseYear:movie.release_date,
+                    rating :movie.vote_average,
+                    description: movie.overview,
+            }
+
+        })
+
+    )
    return  res.status(200).json({message:"Movie fetched successfully!", movies});
 
     }catch(error){
@@ -37,28 +47,22 @@ const searchMovies = async(req,res)=>{
     }
 }
 
-const getActors = async(req,res)=>{
+const getActors = async(movieId)=>{
     try{
-
-        const {movieId} =  req.params;
 
         const response = await axiosInstance.get(`https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=${TMDB_API_KEY}`);
 
         const actors = response.data.cast
         .filter((actor) => actor.known_for_department === 'Acting')
-        .map((actor)=>({
-              name : actor.name,
-              department : actor.known_for_department,
-              popularity: actor.popularity,
-              character: actor.character,
-        }));
+        .map((actor)=> actor.name
+        ).slice(0, 5).join(", ");
 
          console.log(actors);
-        return res.status(200).json({ message: "Actors fetched successfully!", actors});
+        return actors || "unknown"
 
 
     }catch(error){
-        res.status(500).json({messgae:"Internal Server Error!",error: error.message});
+        console.error("Error in fetching actors", error.message);
     }
 }
 

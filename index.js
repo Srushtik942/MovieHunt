@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const{searchMovies, getActors} = require('./Controllers/apiControllers');
-const{createCuratedList, updateCuratedList,addIntoWatchlist} = require('./Controllers/userApiControllers');
+const{createCuratedList, updateCuratedList,addInToWatchlist} = require('./Controllers/userApiControllers');
 const app = express();
 app.use(express.json());
 
@@ -10,8 +10,7 @@ app.get('/api/search/movie',searchMovies);
 app.get('/api/movie/:movieId/actors',getActors);
 app.post('/api/curated-lists',createCuratedList);
 app.put('/api/curated-lists/:curatedListId',updateCuratedList);
-app.post('/api/movies/watchlist',addIntoWatchlist);
-
+app.post('/api/movies/watchlist',addInToWatchlist);
 
 const PORT = 3000
 

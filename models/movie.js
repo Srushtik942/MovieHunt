@@ -6,11 +6,11 @@ module.exports = (sequelize, DataTypes) => {
       {
         title: {
           type: DataTypes.STRING,
-          allow: false,
+          allowNull: false,
         },
         tmdbId: {
           type: DataTypes.INTEGER,
-          allow: false,
+          allowNull: false,
         },
         genre: {
           type: DataTypes.TEXT,
