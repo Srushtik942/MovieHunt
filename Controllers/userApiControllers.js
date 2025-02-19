@@ -50,16 +50,11 @@ const addInToWatchlist = async (req, res) => {
     console.log(movie);
 
     if (!movie) {
-
       const movieData = await fetchMovieAndCastDetails(movieId);
-       await movieModel.create(movieData);
+      movie =  await movieModel.create(movieData);
     }
+ const saveToWatchlist = await watchlistModel.create({ movieId :movie.id});
 
-    const saveToWatchlist = await watchlistModel.create({ movieId});
-
-    console.log("Adding Movie to Watchlist with movieId:", movieId);
-
- console.log(saveToWatchlist);
     return res.status(200).json({
         message: "Movie added to watchlist successfully!",
         saveToWatchlist,

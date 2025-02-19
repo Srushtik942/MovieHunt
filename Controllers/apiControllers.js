@@ -47,6 +47,7 @@ const searchMovies = async(req,res)=>{
     }
 }
 
+// service function
 const getActors = async(movieId)=>{
     try{
 

@@ -17,16 +17,16 @@ const fetchMovieAndCastDetails = async(tmdbId) =>{
    }
    try{
      const movieResponse = await axiosInstance.get(`https://api.themoviedb.org/3/movie/${tmdbId}?api_key=${TMDB_API_KEY}`);
-     const castResponse = await axiosInstance.get(`https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=${TMDB_API_KEY}`);
+     const castResponse = await axiosInstance.get(`https://api.themoviedb.org/3/movie/${tmdbId}/credits?api_key=${TMDB_API_KEY}`);
 
      const movieData = movieResponse.data;
      const castData = castResponse.data.cast.slice(0,5).map((actor)=>actor.name).join(", ");
      return{
-        // title: movieData.title,
+        title: movieData.title,
         tmdbId: movieData.id,
-        genre: movieData.genres.map((g)=>g.name).join(", "),
+        genre: movieData.genres.map((g)=>g.name).join(", ") || 'Not Known',
         actors: castData,
-        release_Date: movieData.release_Date,
+        release_Date: movieData.release_Date || "unknown",
         rating :movieData.vote_average,
         description: movieData.overview,
      };
