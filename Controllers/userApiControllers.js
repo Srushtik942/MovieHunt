@@ -55,6 +55,7 @@ const addInToWatchlist = async (req, res) => {
     }
  const saveToWatchlist = await watchlistModel.create({ movieId :movie.id});
 
+
     return res.status(200).json({
         message: "Movie added to watchlist successfully!",
         saveToWatchlist,
@@ -68,5 +69,36 @@ const addInToWatchlist = async (req, res) => {
   }
 };
 
+// save to wishlist
 
-module.exports = {createCuratedList, updateCuratedList, addInToWatchlist};
+const addIntoWishlist = async(req,res)=>{
+  try{
+    const {movieId} = req.body;
+
+    if(!movieId){
+      return res.status(404).json({message:"Movie Id is required!"});
+    }
+    let movie = await movieExistsInDB(movieId);
+    console.log(movie);
+
+    if(!movie){
+      const movieData = await fetchMovieAndCastDetails(movieId);
+      movie = await movieModel.create(movieData);
+    }
+    const saveToWishlist = await wishlistModel.create({movieId: movie.id});
+
+    return res.status(200).json({
+      message: "Movie added into wishilist successfully!",
+      saveToWishlist
+    })
+
+
+  }catch(error){
+    res.status(500).json({message:"Interanl Server Error!",error:error.message});
+  }
+}
+
+
+
+
+module.exports = {createCuratedList, updateCuratedList, addInToWatchlist, addIntoWishlist};
