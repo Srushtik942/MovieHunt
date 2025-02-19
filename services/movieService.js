@@ -1,5 +1,6 @@
 const axiosInstance = require('axios');
-const {movie:movieModel} = require ("../models")
+const {movie:movieModel,curatedList: curatedListModel} = require ("../models");
+const { where } = require('sequelize');
 const TMDB_API_KEY = process.env.API_KEY;
 // Service Function
 // checking movie Exist in db or not
@@ -8,6 +9,14 @@ const movieExistsInDB = async(movieId)=>{
 
     return existInDB ? true : false ;
 }
+
+//Checking movie present in curatedList or not
+const checkMovieInCuratedList = async(curatedListId)=>{
+   const existInCuratedList = await curatedListModel.findOne({where:{id:curatedListId}});
+
+   return existInCuratedList ? true : false;
+}
+
 
 // fetching movie and cast details
 
@@ -38,5 +47,5 @@ const fetchMovieAndCastDetails = async(tmdbId) =>{
    }
 }
 
-module.exports = {movieExistsInDB, fetchMovieAndCastDetails};
+module.exports = {movieExistsInDB, fetchMovieAndCastDetails,checkMovieInCuratedList };
 

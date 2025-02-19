@@ -1,6 +1,6 @@
 const { where } = require('sequelize');
-const {curatedList: curatedListModel, wishlist: wishlistModel, movie:movieModel, watchlist: watchlistModel} = require('../models');
-const { movieExistsInDB, fetchMovieAndCastDetails } = require('../services/movieService');
+const {curatedList: curatedListModel, wishlist: wishlistModel, movie:movieModel, watchlist: watchlistModel, curatedListItem: curatedListItemModel} = require('../models');
+const { movieExistsInDB, fetchMovieAndCastDetails, checkMovieInCuratedList } = require('../services/movieService');
 
 const createCuratedList = async(req,res)=>{
     try{
@@ -98,7 +98,38 @@ const addIntoWishlist = async(req,res)=>{
   }
 }
 
+//save to curated ListItem
+
+const addToCuratedListItem = async(req,res)=>{
+  try{
+  const {movieId, curatedListId} = req.body;
+
+  if(!movieId ){
+    return res.status(404).json({message:"Movied is required!"});
+  }
+  //  let movie = await checkMovieInCuratedList(curatedListId);
+   let movie = await movieExistsInDB(movieId);
+
+   if(!movie){
+    const movieData = await fetchMovieAndCastDetails(movieId);
+    console.log(movieData);
+     movie = await movieModel.create(movieData);
+   }
+   console.log(movie);
+   const saveToCuratedListItem = await curatedListItemModel.create({
+    curatedListId: curatedListId,
+    movieId: movie.id
+  });
+  console.log(movie.id);
+
+
+   return res.status(200).json({message:"Movie added to curated list successfully.",saveToCuratedListItem});
+  }
+  catch(error){
+    return res.status(500).json({message:"Internal Server Error!", error:error.message});
+  }
+}
 
 
 
-module.exports = {createCuratedList, updateCuratedList, addInToWatchlist, addIntoWishlist};
+module.exports = {createCuratedList, updateCuratedList, addInToWatchlist, addIntoWishlist, addToCuratedListItem};
