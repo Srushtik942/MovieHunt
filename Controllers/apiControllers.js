@@ -1,7 +1,10 @@
 const { default: axios } = require('axios');
 require('dotenv').config();
 const axiosInstance = require('../library/axios.lib');
+const {movie:movieModel} = require('../models');
+const {Op} = require('sequelize')
 const { query } = require('express');
+const { where } = require('sequelize');
 const TMDB_API_KEY = process.env.API_KEY;
 
 if (!TMDB_API_KEY) {
@@ -67,4 +70,71 @@ const getActors = async(movieId)=>{
     }
 }
 
-module.exports = {searchMovies, getActors}
+
+// Searching Lists by Genre and Actor
+
+const searchListByGenreAndActor = async(req,res)=>{
+    try{
+
+    const {genre,actor} = req.query;
+    if(!genre || !actor ){
+        return res.status(400).json({message:"Check your query again!"});
+    }
+
+    const response = await movieModel.findOne({
+        where:{
+            genre : { [Op.like]: `%${genre}%`},
+            actors: { [Op.like]: `%${actor}%`},
+        }
+    });
+
+    // if(response.length === 0){
+    //     return res.status(404).json({message:"No movies found!"});
+    // }
+
+    if(!response){
+        return res.status(404).json({message:"No movie found!"});
+    }
+
+    return res.status(200).json({movie : response});
+
+    }catch(error){
+        return res.status(500).json({message:"Internal Server Error!",error:error.message});
+    }
+
+  }
+
+//   Sorting by Ratings
+
+const sortingByRating = async(req,res)=>{
+    try{
+    const {list , sortBy, order} = req.query;
+
+    if(!list || !sortBy ){
+        return res.status(400).json({message:"Check your query again!"});
+    }
+
+    // validate soting fields
+
+    const validateSortField = ["rating"];
+    if(!validateSortField.includes(sortBy)){
+        return res.status(400).json({message:"Invalid sort parameter!"});
+    }
+
+    const sortedMovies = await movieModel.findAll({
+        include: [{ attributes : ['title','tmdbId','genre','actors','rating']}],
+        order : [[ sortBy]],
+    })
+
+    if (sortedMovies.length === 0) {
+        return res.status(404).json({ message: "No movies found in the list!" });
+      }
+
+    return res.status(200).json({sortedMovies});
+    } catch(error){
+      return res.status(500).json({message:"Internal Server Error!",error:error.message});
+    }
+}
+
+
+module.exports = {searchMovies, getActors,searchListByGenreAndActor,sortingByRating}

@@ -1,5 +1,5 @@
 const { where } = require('sequelize');
-const {curatedList: curatedListModel, wishlist: wishlistModel, movie:movieModel, watchlist: watchlistModel, curatedListItem: curatedListItemModel} = require('../models');
+const {curatedList: curatedListModel, wishlist: wishlistModel, movie:movieModel, watchlist: watchlistModel, curatedListItem: curatedListItemModel, review: reviewModel} = require('../models');
 const { movieExistsInDB, fetchMovieAndCastDetails, checkMovieInCuratedList } = require('../services/movieService');
 
 const createCuratedList = async(req,res)=>{
@@ -105,7 +105,7 @@ const addToCuratedListItem = async(req,res)=>{
   const {movieId, curatedListId} = req.body;
 
   if(!movieId ){
-    return res.status(404).json({message:"Movied is required!"});
+    return res.status(404).json({message:"Movie Id is required!"});
   }
   //  let movie = await checkMovieInCuratedList(curatedListId);
    let movie = await movieExistsInDB(movieId);
@@ -123,13 +123,46 @@ const addToCuratedListItem = async(req,res)=>{
   console.log(movie.id);
 
 
-   return res.status(200).json({message:"Movie added to curated list successfully.",saveToCuratedListItem});
+   return res.status(200).json({message:"Movie added to curated listItem  successfully.",saveToCuratedListItem});
   }
   catch(error){
     return res.status(500).json({message:"Internal Server Error!", error:error.message});
   }
 }
 
+// Adding Reviews and Ratings to Movies
+
+const addReviewsAndRatings = async(req,res)=>{
+  try{
+  const {movieId} = req.params;
+  const {rating, reviewText} = req.body;
+
+  if(rating>10 || rating<0){
+    return res.status(404).json({message:"Check your rating again!"});
+  }
+  if(reviewText.length > 500){
+    return res.status(404).json({message:"Please keep your review under 500 characters!"});
+  }
+//  check movie present in db or not
+
+let movie = await movieExistsInDB(movieId);
+
+if(!movie){
+  const movieData = await fetchMovieAndCastDetails(movieId);
+  movie = await movieModel.create(movieData);
+}
+console.log("Movie data before saving review:", movie);
+
+const saveToReview = await reviewModel.create({
+  movieId: movie.id,
+  rating: rating,
+  reviewText:reviewText,
+})
+return res.status(200).json({message: "Review added successfully!",saveToReview});
+}catch(error){
+  return res.status(500).json({message:"Internal Server Error!", error:error.message});
+}
+}
 
 
-module.exports = {createCuratedList, updateCuratedList, addInToWatchlist, addIntoWishlist, addToCuratedListItem};
+module.exports = {createCuratedList, updateCuratedList, addInToWatchlist, addIntoWishlist, addToCuratedListItem, addReviewsAndRatings};
