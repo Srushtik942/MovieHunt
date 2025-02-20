@@ -1,7 +1,7 @@
 const { default: axios } = require('axios');
 require('dotenv').config();
 const axiosInstance = require('../library/axios.lib');
-const {movie:movieModel} = require('../models');
+const {movie:movieModel , review:reviewModel} = require('../models');
 const {Op} = require('sequelize')
 const { query } = require('express');
 const { where } = require('sequelize');
@@ -114,7 +114,9 @@ const sortingByRating = async(req,res)=>{
         return res.status(400).json({message:"Check your query again!"});
     }
 
-    // validate soting fields
+    const sortOrder = order ? order.toUpperCase() : "ASC";
+
+    // validate sorting fields
 
     const validateSortField = ["rating"];
     if(!validateSortField.includes(sortBy)){
@@ -122,8 +124,8 @@ const sortingByRating = async(req,res)=>{
     }
 
     const sortedMovies = await movieModel.findAll({
-        include: [{ attributes : ['title','tmdbId','genre','actors','rating']}],
-        order : [[ sortBy]],
+        attributes : ["title","tmdbId","genre","actors","rating"],
+        order : [[ Sequelize.col(sortBy) ,sortOrder]],
     })
 
     if (sortedMovies.length === 0) {
@@ -136,5 +138,43 @@ const sortingByRating = async(req,res)=>{
     }
 }
 
+const getTopFiveMovies = async(req,res)=>{
+   try{
+    const movies = await movieModel.findAll({
+        attributes : ['title', 'tmdbId', 'genre','actors','rating'],
+        limit : 5,
+        order: [["rating","DESC"]],
+        include:[
+            {
+                model: reviewModel,
+                attributes : ["reviewText"],
+            }
+        ]
+    });
+    if(movies.length === 0){
+        return res.status(404).json({message:"No movies found!"});
+    }
 
-module.exports = {searchMovies, getActors,searchListByGenreAndActor,sortingByRating}
+    const moviesWithReviews = movies.map((movie)=>({
+        title : movie.title,
+        tmdbId: movie.tmdbId,
+        genre : movie.genre,
+        actors: movie.actors,
+        rating: movie.rating,
+        reviews : movie.reviews?movie.reviews.map((review)=>({
+            reviewText: review.reviewText,
+            wordCount: review.reviewText ? review.reviewText.split(/\s+/).length : 0,
+        }))
+        : [],
+
+    }));
+
+    return res.status(200).json({ movies: moviesWithReviews });
+
+   }catch(error){
+    res.status(500).json({message:"Internal Server Error!",error:error.message});
+   }
+}
+
+
+module.exports = {searchMovies, getActors,searchListByGenreAndActor,sortingByRating,getTopFiveMovies}
