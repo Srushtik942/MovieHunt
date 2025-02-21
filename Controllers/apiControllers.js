@@ -14,7 +14,7 @@ if (!TMDB_API_KEY) {
 // const actors = await
 
 // : Making API Calls From TMDB
-const searchMovies = async(req,res)=>{c
+const searchMovies = async(req,res)=>{
     try{
 
      const{query} = req.query;
