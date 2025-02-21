@@ -14,7 +14,7 @@ if (!TMDB_API_KEY) {
 // const actors = await
 
 // : Making API Calls From TMDB
-const searchMovies = async(req,res)=>{
+const searchMovies = async(req,res)=>{c
     try{
 
      const{query} = req.query;
@@ -87,10 +87,6 @@ const searchListByGenreAndActor = async(req,res)=>{
             actors: { [Op.like]: `%${actor}%`},
         }
     });
-
-    // if(response.length === 0){
-    //     return res.status(404).json({message:"No movies found!"});
-    // }
 
     if(!response){
         return res.status(404).json({message:"No movie found!"});

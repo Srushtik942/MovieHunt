@@ -58,7 +58,6 @@ const addInToWatchlist = async (req, res) => {
 
     return res.status(200).json({
         message: "Movie added to watchlist successfully!",
-        saveToWatchlist,
     });
 
   } catch (error) {
@@ -88,8 +87,8 @@ const addIntoWishlist = async(req,res)=>{
     const saveToWishlist = await wishlistModel.create({movieId: movie.id});
 
     return res.status(200).json({
-      message: "Movie added into wishilist successfully!",
-      saveToWishlist
+      message: "Movie added into wishlist successfully!",
+
     })
 
 
@@ -123,7 +122,7 @@ const addToCuratedListItem = async(req,res)=>{
   console.log(movie.id);
 
 
-   return res.status(200).json({message:"Movie added to curated listItem  successfully.",saveToCuratedListItem});
+   return res.status(200).json({message:"Movie added to curated listItem successfully."});
   }
   catch(error){
     return res.status(500).json({message:"Internal Server Error!", error:error.message});
@@ -158,7 +157,7 @@ const saveToReview = await reviewModel.create({
   rating: rating,
   reviewText:reviewText,
 })
-return res.status(200).json({message: "Review added successfully!",saveToReview});
+return res.status(200).json({message: "Review added successfully!"});
 }catch(error){
   return res.status(500).json({message:"Internal Server Error!", error:error.message});
 }
