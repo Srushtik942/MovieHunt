@@ -40,19 +40,18 @@ Install dependencies:
 
 ---
 
-    Set up environment variables:
+Set up environment variables:
 
 Create a .env file at the root with the following variables:
 
-DB_NAME=your_database_name
-DB_USER=your_database_user
-DB_PASS=your_database_password
-DB_HOST=localhost
-PORT=3000
-CLOUDINARY_CLOUD_NAME=your_cloud_name (if using Cloudinary)
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
-
+     DB_NAME=your_database_name
+     DB_USER=your_database_user
+     DB_PASS=your_database_password
+     DB_HOST=localhost
+     PORT=3000
+     CLOUDINARY_CLOUD_NAME=your_cloud_name (if using Cloudinary)
+     CLOUDINARY_API_KEY=your_api_key
+     CLOUDINARY_API_SECRET=your_api_secret
 ---
 
 Run migrations and seed database (if applicable):
