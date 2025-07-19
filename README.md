@@ -54,10 +54,10 @@ Create a .env file at the root with the following variables:
      CLOUDINARY_API_SECRET=your_api_secret
 ---
 
-Run migrations and seed database (if applicable):
+Run migrations and seed database :
 
-npx sequelize db:migrate
-npx sequelize db:seed:all
+    npx sequelize db:migrate
+    npx sequelize db:seed:all
 
 
 ---
