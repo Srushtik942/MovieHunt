@@ -15,3 +15,5 @@
 -  Get top 5 movies by rating and detailed review
     - get request
 -  Testcases for endpoints
+- Clone Repo
+  - git clone MovieHunt
